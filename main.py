@@ -81,7 +81,6 @@ if __name__ == '__main__':
     bogo_pool.imap(bogofilter, iglob(os.path.join(INBOXDIR, "new", "*")))
     bogo_pool.close()
     bogo_pool.join()
-    print numprocs
 
     print("Filtering ...")
     # filter in parallel
