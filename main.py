@@ -26,7 +26,7 @@ def filter(args):
     key, message = args
 
     # BLACKLISTED WORDS/PHRASES
-    flat_msg = ' '.join(str(message).split("\n"))
+    flat_msg = ' '.join(str(message).split("\n")).lower()
     for badword in blacklisted:
         if badword in flat_msg:
             print("badword: %s (%s)" % (badword, message["subject"]))
