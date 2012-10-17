@@ -11,12 +11,12 @@ from multiprocessing import cpu_count, Pool
 # MIT License
 # © 2012 Noah K. Tilton <noahktilton@gmail.com>
 
-from config import BASEDIR, addresses, mark_read
+from config import BASE_MAILDIR, addresses, mark_read
 from spam import bogofilter, blacklisted
 from utils import mv, rm
 
-INBOXDIR    = os.path.join(BASEDIR, "INBOX")
-mailboxes   = dict((name, mailbox.Maildir(os.path.join(BASEDIR, name))) for name in [os.path.basename(dir) for dir in iglob(os.path.join(BASEDIR, "*"))])
+INBOXDIR    = os.path.join(BASE_MAILDIR, "INBOX")
+mailboxes   = dict((name, mailbox.Maildir(os.path.join(BASE_MAILDIR, name))) for name in [os.path.basename(dir) for dir in iglob(os.path.join(BASE_MAILDIR, "*"))])
 
 
 # N.B.: the order of the following filters matters.  note the return
