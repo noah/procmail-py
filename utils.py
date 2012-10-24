@@ -2,6 +2,19 @@ from gi.repository import Notify
 from os.path import dirname, basename
 
 
+def spammy(message):
+    spamh = message["x-bogosity"]
+    if spamh is not None:
+        try:
+            spambool = spamh.split(',')[0]
+            if spambool == "Spam":
+                # spam!
+                return True
+        except ValueError:
+            print("bogo couldn't split %s %s" % (spamh, key))
+    return False
+
+
 def notify(message):
     Notify.init("new mail")
     if message.is_multipart():  msg = "%s attachments ..." % len(message.get_payload())
@@ -19,7 +32,7 @@ def maildirname(maildir):
 
 def mv(src, dst, message, key):
     print("mv %s/%s -> %s" % (maildirname(src), message.get("subject", ''), maildirname(dst)))
-    notify(message)
+
     dst.lock()
     dst.add(message)
     dst.flush()

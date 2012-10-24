@@ -13,7 +13,7 @@ from multiprocessing import cpu_count, Pool
 
 from config import BASE_MAILDIR, addresses, mark_read
 from spam import bogofilter, blacklisted
-from utils import mv, rm
+from utils import mv, rm, spammy, notify
 
 INBOXDIR    = os.path.join(BASE_MAILDIR, "INBOX")
 mailboxes   = dict((name, mailbox.Maildir(os.path.join(BASE_MAILDIR, name))) for name in [os.path.basename(dir) for dir in iglob(os.path.join(BASE_MAILDIR, "*"))])
@@ -34,16 +34,12 @@ def filter(args):
             return
 
     # SPAM?
-    spamh = message["x-bogosity"]
-    if spamh is not None:
-        try:
-            spambool = spamh.split(',')[0]
-            if spambool == "Spam":
-                # spam!
-                mv(INBOX, mailboxes["Junk"], message, key)
-                return
-        except ValueError:
-            print("bogo couldn't split %s %s" % (spamh, key))
+    if spammy(message):
+        mv(INBOX, mailboxes["Junk"], message, key)
+        return
+    else:
+      # only notify if non-spammy
+      notify(message)
 
     # MARK-AS-READ?
     for header, string in mark_read.items():
