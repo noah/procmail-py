@@ -45,7 +45,6 @@ def filter(args):
 
         # SPAM?
         if spammy_spamc(message):
-            # FIXME 
             mark_as_read(message)
             mv(INBOX, mailboxes["Junk"], message, key)
             return
@@ -78,24 +77,28 @@ def filter(args):
 
 if __name__ == '__main__':
     INBOX       = mailbox.Maildir(INBOXDIR, factory=None)
-    numprocs    = (min((cpu_count() + 2), len(INBOX)))
-    if numprocs < 1: sys.exit()
-    get_pool    = lambda: Pool(processes=numprocs)
+    #numprocs    = (min((cpu_count() + 2), len(INBOX)))
+    #if numprocs < 1: sys.exit()
+    #get_pool    = lambda: Pool(processes=numprocs)
 
-    print("Pool size: %s" % numprocs)
-
+    print("Spam checking ...")
+    for email in iglob(os.path.join(INBOXDIR, "new", "*")):
+        spamc(email)
     # run mail through spamc in parallel
-    print("Running bogo ...")
-    bogo_pool = get_pool()
-    bogo_pool.imap(spamc, iglob(os.path.join(INBOXDIR, "new", "*")))
-    bogo_pool.close()
-    bogo_pool.join()
+    #print("Running bogo ...")
+    #bogo_pool = get_pool()
+    #bogo_pool.imap(spamc, iglob(os.path.join(INBOXDIR, "new", "*")))
+    #bogo_pool.close()
+    #bogo_pool.join()
 
     print("Filtering ...")
+    for email in INBOX.iteritems():
+        filter(email)
+
     # filter in parallel
-    filter_pool = get_pool()
-    filter_pool.map(filter, INBOX.iteritems())
-    filter_pool.close()
-    filter_pool.join()
+    #filter_pool = get_pool()
+    #filter_pool.map(filter, INBOX.iteritems())
+    #filter_pool.close()
+    #filter_pool.join()
 
     [box.close() for name, box in mailboxes.items()]

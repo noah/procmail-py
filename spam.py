@@ -4,10 +4,6 @@ from subprocess import Popen
 
 from config import BASEDIR
 
-# WARNING:
-#
-# emails which contain words in badwords.txt will be summarily deleted!
-#
 # format is one bad word per line, all lowercase
 blacklisted = [w.strip() for w in open(os.path.join(BASEDIR, 'badwords.txt')).readlines()]
 
