@@ -10,7 +10,6 @@ blacklisted = [w.strip() for w in open(os.path.join(BASEDIR, 'badwords.txt')).re
 
 
 def spamc(mail):
-    print("processing %s" % mail)
     # run spam filtering on all new mails in the INBOX
     # annotate the mail headers
     failure = True

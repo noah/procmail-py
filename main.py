@@ -68,6 +68,7 @@ def filter(args):
                           message["subject"]))
 
         # WHITELISTED SENDER?
+        # FIXME - this should be a regex, not an 'in' check
         for addr in addresses.keys():
             if addr in message["from"].lower():
                 mv(INBOX, mailboxes[addresses[addr]], message, key)
@@ -81,7 +82,7 @@ if __name__ == '__main__':
     #if numprocs < 1: sys.exit()
     #get_pool    = lambda: Pool(processes=numprocs)
 
-    print("Spam checking ...")
+    #print("Spam checking ...")
     for email in iglob(os.path.join(INBOXDIR, "new", "*")):
         spamc(email)
     # run mail through spamc in parallel
@@ -91,7 +92,7 @@ if __name__ == '__main__':
     #bogo_pool.close()
     #bogo_pool.join()
 
-    print("Filtering ...")
+    #print("Filtering ...")
     for email in INBOX.iteritems():
         filter(email)
 
