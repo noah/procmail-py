@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
+import time
 from glob import iglob
 import mailbox
-from multiprocessing import cpu_count, Pool
 
 # procmail-py - Email content and spam filtering
 # MIT License
@@ -60,9 +59,15 @@ def filter(args):
             if list_header is not None:
                 try:
                     list_id, remainder = list_header.split("@")
-                    if list_id in mailboxes.keys():
-                        mv(INBOX, mailboxes[list_id], message, key)
-                        return
+                    destination = None
+                    if list_id not in mailboxes.keys():
+                        # maildir doesn't exist: create it.
+                        mailbox.Maildir(os.path.join(BASE_MAILDIR, list_id), create=True)
+                        destination = list_id
+                    else:
+                        destination = mailboxes[list_id]
+                    mv(INBOX, destination, message, key)
+                    return
                 except ValueError:
                     print("couldn't split %s %s %s" % (list_header, key,
                           message["subject"]))
@@ -82,24 +87,11 @@ if __name__ == '__main__':
     #if numprocs < 1: sys.exit()
     #get_pool    = lambda: Pool(processes=numprocs)
 
-    #print("Spam checking ...")
     for email in iglob(os.path.join(INBOXDIR, "new", "*")):
-        spamc(email)
-    # run mail through spamc in parallel
-    #print("Running bogo ...")
-    #bogo_pool = get_pool()
-    #bogo_pool.imap(spamc, iglob(os.path.join(INBOXDIR, "new", "*")))
-    #bogo_pool.close()
-    #bogo_pool.join()
+        if time.time() - os.stat(email).st_mtime < 90:
+            spamc(email)
 
-    #print("Filtering ...")
     for email in INBOX.iteritems():
         filter(email)
-
-    # filter in parallel
-    #filter_pool = get_pool()
-    #filter_pool.map(filter, INBOX.iteritems())
-    #filter_pool.close()
-    #filter_pool.join()
 
     [box.close() for name, box in mailboxes.items()]

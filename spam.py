@@ -15,11 +15,11 @@ def spamc(mail):
     failure = True
     backup  = ".".join([mail, "bak"])
     with open(mail, 'r') as f:
-        # run through spamc 
+        # run through spamc
         #  create a temporary file
         with open(backup, 'w') as bak:
             # run the mail through spamc
-            bogo = Popen(["/usr/bin/vendor_perl/spamc"], stdin=f, stdout=bak)
-            failure = bogo.wait() != 0
+            spamc = Popen(["/usr/bin/vendor_perl/spamc"], stdin=f, stdout=bak)
+            failure = spamc.wait() != 0
     if failure: print("error:  spamc failed on %s" % mail)
     else:       shutil.move(backup, mail)
