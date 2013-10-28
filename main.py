@@ -10,7 +10,7 @@ import mailbox
 # MIT License
 # © 2012 Noah K. Tilton <noahktilton@gmail.com>
 
-from config import BASE_MAILDIR, addresses, mark_read
+from config import BASE_MAILDIR, MY_DOMAINS, addresses, mark_read
 from spam import spamc, blacklisted
 from utils import mv, spammy_spamc, mark_as_read, uniq
 
@@ -59,6 +59,9 @@ def filter(args):
             if list_header is not None:
                 try:
                     list_id, remainder = list_header.split("@")
+                    remainder = remainder.strip()
+                    # only allow mailinglist delivery to MY_DOMAINS
+                    if remainder not in MY_DOMAINS: return
                     destination = None
                     if list_id not in mailboxes.keys():
                         # maildir doesn't exist: create it.
