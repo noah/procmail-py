@@ -1,0 +1,32 @@
+import os
+
+BASE_MAILDIR    = "/path/to/maildir/base"
+BASEDIR         = os.path.dirname(__file__)
+
+MY_DOMAINS      = ["some.tld", "blog.some.tld"]
+
+addresses = {
+            # email (partial OK)        # folder
+            #
+            # lower-case only!
+            #
+            "somebody@tld1"             : "tld1",
+            "somebody-else@tld1"        : "tld1",
+            "somebody-third@tld1"       : "tld1",
+            #
+            "google.com"                : "google",
+            #
+            "boss@mywork"               : "@vip",
+            #
+            # other
+            "redmine"                   : "redmine",
+            "(jira)"                    : "jira"
+}
+
+mark_read = {
+            "from"                      : "me@mytld",
+            "from"                      : "redmine@domain.com",
+            "subject"                   : "daily backup report",
+}
+
+# vim: ft=python
