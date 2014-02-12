@@ -48,17 +48,20 @@ def maildirname(maildir):
 
 
 def mv(src, dst, message, key):
-    notify(message)
-    print("mv %s/%s -> %s" % (maildirname(src), message.get("subject", ''), maildirname(dst)))
 
-    dst.lock()
-    dst.add(message)
-    dst.flush()
-    dst.unlock()
-    src.lock()
-    src.discard(key)
-    src.flush()
-    src.unlock()
+    # skip inbox messages marked for follow-up
+    if not 'x-tickler' in message:
+        notify(message)
+        print("mv %s/%s -> %s" % (maildirname(src), message.get("subject", ''), maildirname(dst)))
+
+        dst.lock()
+        dst.add(message)
+        dst.flush()
+        dst.unlock()
+        src.lock()
+        src.discard(key)
+        src.flush()
+        src.unlock()
 
 
 def rm(src, key):
