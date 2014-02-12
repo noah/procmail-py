@@ -31,7 +31,7 @@ def notify(message):
     if spammy_spamc(message): return
     Notify.init("new mail")
     if message.is_multipart():  msg = "%s attachments ..." % len(message.get_payload())
-    else:                       msg = "%s ..." % message.get_payload()[:100]
+    else:                       msg = "%s ..." % message.get_payload(decode=True)[:100]
 
     try:
         n = Notify.Notification.new("\n".join([message.get("from", ""), message.get("subject", "")]),
