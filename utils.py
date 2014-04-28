@@ -1,6 +1,8 @@
 from gi.repository import Notify
 from os.path import dirname, basename
 
+from config import VIPs
+
 
 def spammy_bogo(message):
     spamh = message["x-bogosity"]
@@ -34,9 +36,14 @@ def notify(message):
     else:                       msg = "%s ..." % message.get_payload(decode=True)[:100]
 
     try:
-        n = Notify.Notification.new("\n".join([message.get("from", ""), message.get("subject", "")]),
-                                    msg,
-                                    "dialog-information")
+        n = Notify.Notification.new(
+                "\n".join([
+                    'From:      %s' % message.get("from", ""),
+                    'To:        %s' % message.get("to", ""),
+                    'Subject:   %s' % message.get("subject", "")
+                ]),
+                msg,
+                "dialog-information")
         n.set_timeout(30000)
         n.show()
     except Exception, e:
@@ -49,11 +56,13 @@ def maildirname(maildir):
 
 def mv(src, dst, message, key):
 
-    # skip inbox messages marked for follow-up
-    if not 'x-tickler' in message:
+    if message.get('from', '') in VIPs.keys():
+        # reduce noise - only notify about messages from VIPs
         notify(message)
         print("mv %s/%s -> %s" % (maildirname(src), message.get("subject", ''), maildirname(dst)))
 
+    # skip inbox messages marked for follow-up
+    if not 'x-tickler' in message:
         dst.lock()
         dst.add(message)
         dst.flush()
