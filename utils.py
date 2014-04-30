@@ -1,3 +1,5 @@
+import re
+
 from gi.repository import Notify
 from os.path import dirname, basename
 
@@ -54,23 +56,35 @@ def maildirname(maildir):
     return basename(dirname(maildir._paths["new"]))
 
 
-def mv(src, dst, message, key):
+def file(src, dst, message, key):
 
-    if message.get('from', '') in VIPs.keys():
-        # reduce noise - only notify about messages from VIPs
-        notify(message)
-        print("mv %s/%s -> %s" % (maildirname(src), message.get("subject", ''), maildirname(dst)))
+    # ignore any message that is a tickler message
+    if 'x-tickler' in message: return
 
-    # skip inbox messages marked for follow-up
-    if not 'x-tickler' in message:
-        dst.lock()
-        dst.add(message)
-        dst.flush()
-        dst.unlock()
-        src.lock()
-        src.discard(key)
-        src.flush()
-        src.unlock()
+    # notify, but only if from a VIP
+
+    # extract addr from string in fmt "Joe P. Quinn <joe@quinn.com>"
+    from_header = message.get('from', '')
+    from_match  = re.search("[^ <]+@.[^ >]+", from_header)
+
+    if from_match:
+        from_addr = from_match.group(0)
+        if from_addr in VIPs.keys():
+            notify(message)
+
+    else:
+        print "bad from address:", ffrom
+
+    # file away, no matter whether from VIP or not
+    print("mv %s/%s -> %s" % (maildirname(src), message.get("subject", ''), maildirname(dst)))
+    dst.lock()
+    dst.add(message)
+    dst.flush()
+    dst.unlock()
+    src.lock()
+    src.discard(key)
+    src.flush()
+    src.unlock()
 
 
 def rm(src, key):
