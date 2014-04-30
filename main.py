@@ -12,7 +12,7 @@ import mailbox
 
 from config import BASE_MAILDIR, MY_DOMAINS, addresses, mark_read
 from spam import spamc, blacklisted
-from utils import mv, spammy_spamc, mark_as_read, uniq
+from utils import file, spammy_spamc, mark_as_read, uniq
 
 INBOXDIR            = os.path.join(BASE_MAILDIR, "INBOX")
 maildirs_on_disk    = [os.path.basename(dir) for dir in iglob(os.path.join(BASE_MAILDIR, "*"))]
@@ -39,13 +39,13 @@ def filter(args):
                 if badword in flat_msg:
                     print("badword: %s (%s)" % (badword, message["subject"]))
                     mark_as_read(message)
-                    mv(INBOX, mailboxes["Junk"], message, key)
+                    file(INBOX, mailboxes["Junk"], message, key)
                     return
 
         # SPAM?
         if spammy_spamc(message):
             mark_as_read(message)
-            mv(INBOX, mailboxes["Junk"], message, key)
+            file(INBOX, mailboxes["Junk"], message, key)
             return
 
         # MARK-AS-READ?
@@ -69,7 +69,7 @@ def filter(args):
                         destination = list_id
                     else:
                         destination = mailboxes[list_id]
-                    mv(INBOX, destination, message, key)
+                    file(INBOX, destination, message, key)
                     return
                 except ValueError:
                     print("couldn't split %s %s %s" % (list_header, key,
@@ -79,7 +79,7 @@ def filter(args):
         # FIXME - this should be a regex, not an 'in' check
         for addr in addresses.keys():
             if addr in message["from"].lower():
-                mv(INBOX, mailboxes[addresses[addr]], message, key)
+                file(INBOX, mailboxes[addresses[addr]], message, key)
                 return
     except Exception, e:
         print("error", e)
