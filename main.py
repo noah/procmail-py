@@ -8,7 +8,7 @@ import mailbox
 
 # procmail-py - Email content and spam filtering
 # MIT License
-# © 2012 Noah K. Tilton <noahktilton@gmail.com>
+# © 2014 Noah K. Tilton <code@tilton.co>
 
 from config import BASE_MAILDIR, MY_DOMAINS, addresses, mark_read
 from spam import spamc, blacklisted
