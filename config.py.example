@@ -1,27 +1,21 @@
 import os
+import json
 
 BASE_MAILDIR    = "/path/to/maildir/base"
 BASEDIR         = os.path.dirname(__file__)
+ADDRESS_FILE    = os.path.join(BASEDIR, "addresses.json")
+VIPS_FILE       = os.path.join(BASEDIR, "vips.json")
 
 MY_DOMAINS      = ["some.tld", "blog.some.tld"]
 
-addresses = {
-            # email (partial OK)        # folder
-            #
-            # lower-case only!
-            #
-            "somebody@tld1"             : "tld1",
-            "somebody-else@tld1"        : "tld1",
-            "somebody-third@tld1"       : "tld1",
-            #
-            "google.com"                : "google",
-            #
-            "boss@mywork"               : "@vip",
-            #
-            # other
-            "redmine"                   : "redmine",
-            "(jira)"                    : "jira"
-}
+with open( ADDRESS_FILE ) as af:
+    non_VIPs = json.load(af)
+
+with open( VIPS_FILE ) as vf:
+    VIPs = json.load(vf)
+
+addresses = non_VIPs.copy()
+addresses.update( VIPs )
 
 mark_read = {
             "from"                      : "me@mytld",
