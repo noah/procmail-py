@@ -16,6 +16,10 @@ from email.utils import getaddresses
 
 from config import non_VIPs, VIPs, ADDRESS_FILE, VIPS_FILE
 
+
+def confirm(msg):
+    return raw_input("{} [Y/n] ".format(msg)).strip().lower() in ['y', '']
+
 if __name__ == '__main__':
 
 
@@ -32,37 +36,43 @@ if __name__ == '__main__':
     sys.stdin = open("/dev/tty")
 
     for name, addr in addrs:
-        if addr in non_VIPs.keys()  or addr in VIPs.keys():
-            print "{} is already added".format( addr )
+        addr = addr.lower()
+        try:
+            _ = VIPs[addr]
+            print ("key exists: {} -> @vip".format( addr ))
             continue
+        except KeyError:
+            pass
+
+        try:
+            dst = non_VIPs[addr]
+            print ("key exists: {} -> {}".format( addr, dst ))
+            continue
+        except KeyError:
+            pass
+
+        user, domain = addr.split('@')
+
+        # prompt for VIP status
+
+        fmap        = {True: VIPS_FILE, False: ADDRESS_FILE}
+        vd          = {True:'VIP', False:'Non-VIP'}
+        is_vip      = raw_input("{} is VIP [y/N]? ".format(addr)).strip().lower() in ['y']
+
+        if is_vip:
+            folder_name = "@vip"
+            VIPs.update({addr:folder_name})
+            if confirm("{} -> {} ({})".format(addr, folder_name, vd[is_vip])):
+                with open(fmap[is_vip], 'w') as f:
+                    json.dump(VIPs, f)
         else:
-            user, domain = addr.split('@')
-            response = raw_input("{} -> {} [Enter/folder name/X] ".format(addr,
-                user)).strip()
-            if response == "":
-                folder = user
-            elif response.lower() == "x":
+            folder_name = raw_input("{} -> {} [Enter/folder name/X] ".format(addr, user)).strip().lower()
+            if folder_name == "":
+                folder_name = user
+            elif folder_name == "x":
                 break
             else:
-                folder = response
-            response    = raw_input("{} is VIP [y/N]?".format(addr)).strip()
-            vip         = response.lower() in ['y']
-            vd          = {True:'VIP', False:'Non-VIP'}
-            response    = raw_input("{} -> {} ({}) [Y/n]".format(addr, folder,
-                                        vd[vip])).strip()
-            if response.lower() in ['', 'y']:
-
-                # do it.
-                print "{} -> {} {}".format(addr, folder, vd[vip])
-                fmap = {True: VIPS_FILE, False: ADDRESS_FILE}
-                if vip:
-                    VIPs.update({addr:folder})
-                    with open(fmap[vip], 'w') as f:
-                          json.dump(VIPs, f)
-                else:
-                    non_VIPs.update({addr:folder})
-                    with open(fmap[vip], 'w') as f:
-                          json.dump(non_VIPs, f)
-                print "Added."
-            else:
-                print "Abort."; break
+                if confirm("{} -> {} ({})".format(addr, folder_name, vd[is_vip])):
+                    non_VIPs.update({addr:folder_name})
+                    with open(fmap[is_vip], 'w') as f:
+                        json.dump(non_VIPs, f)
