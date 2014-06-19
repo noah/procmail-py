@@ -71,8 +71,8 @@ if __name__ == '__main__':
                 folder_name = user
             elif folder_name == "x":
                 break
-            else:
-                if confirm("{} -> {} ({})".format(addr, folder_name, vd[is_vip])):
-                    non_VIPs.update({addr:folder_name})
-                    with open(fmap[is_vip], 'w') as f:
-                        json.dump(non_VIPs, f)
+
+            if confirm("{} -> {} ({})".format(addr, folder_name, vd[is_vip])):
+                non_VIPs.update({addr:folder_name})
+                with open(fmap[is_vip], 'w') as f:
+                    json.dump(non_VIPs, f)
