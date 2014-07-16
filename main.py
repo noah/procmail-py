@@ -24,7 +24,7 @@ mailboxes           = dict((d, mailbox.Maildir(os.path.join(BASE_MAILDIR, d), cr
 # N.B.: the order of the following filters matters.  note the return
 # statements.  this short-circuiting is desirable, but has to be done
 # carefully to avoid double-booking mails.
-def filter(args):
+def mfilter(args):
     try:
         key, message = args
 
@@ -55,13 +55,16 @@ def filter(args):
                 mark_as_read(message)
 
         # MAILING LIST?
-        for list_header in [message["delivered-to"], message["reply-to"], message["list-id"]]:
+        ml_indicia = [ message["delivered-to"], message["list-id"], message['reply-to'] ]
+        for list_header in ml_indicia:
             if list_header is not None:
                 try:
                     list_id, remainder = list_header.split("@")
                     remainder = remainder.strip()
                     # only allow mailinglist delivery to MY_DOMAINS
-                    if remainder not in MY_DOMAINS: return
+                    if remainder not in MY_DOMAINS:
+                        print "{} not in {}".format(remainder, MY_DOMAINS)
+                        return
                     destination = None
                     if list_id not in mailboxes.keys():
                         # maildir doesn't exist: create it.
@@ -72,7 +75,7 @@ def filter(args):
                     file(INBOX, destination, message, key)
                     return
                 except ValueError:
-                    print("couldn't split %s %s %s" % (list_header, key,
+                    print("couldn't split: header: %s\n key %s\n subject %s\n" % (list_header, key,
                           message["subject"]))
 
         # WHITELISTED SENDER?
@@ -95,6 +98,6 @@ if __name__ == '__main__':
             spamc(email)
 
     for email in INBOX.iteritems():
-        filter(email)
+        mfilter(email)
 
     [box.close() for name, box in mailboxes.items()]
