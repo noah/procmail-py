@@ -94,8 +94,8 @@ if __name__ == '__main__':
     #get_pool    = lambda: Pool(processes=numprocs)
 
     for email in iglob(os.path.join(INBOXDIR, "new", "*")):
-        if time.time() - os.stat(email).st_mtime < 90:
-            spamc(email)
+        #if time.time() - os.stat(email).st_ctime < 90:
+        spamc(email)
 
     for email in INBOX.iteritems():
         mfilter(email)

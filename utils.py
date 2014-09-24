@@ -15,7 +15,7 @@ def spammy_bogo(message):
                 # spam!
                 return True
         except ValueError:
-            print("bogo couldn't split %s %s" % (spamh, key))
+            print("bogo couldn't split %s %s" % (spamh, message))
     return False
 
 
@@ -27,7 +27,7 @@ def spammy_spamc(message):
                 # spam!
                 return True
         except ValueError:
-            print("spamc header error %s: %s" % (spamh, key))
+            print("spamc header error %s: %s" % (spamh, message))
     return False
 
 
@@ -73,7 +73,7 @@ def file(src, dst, message, key):
             notify(message)
 
     else:
-        print "bad from address:", ffrom
+        print "bad from address:", from_addr
 
     # file away, no matter whether from VIP or not
     print("mv %s/%s -> %s" % (maildirname(src), message.get("subject", ''), maildirname(dst)))
@@ -96,7 +96,7 @@ def rm(src, key):
 
 
 def mark_as_read(message):
-    print(type(message))
+    print("marked as read", message)
     message.add_flag('S') # ('S'een)
 
 
