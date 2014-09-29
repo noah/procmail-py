@@ -60,11 +60,11 @@ def mfilter(args):
             if list_header is not None:
                 try:
                     list_id, remainder = list_header.split("@")
-                    remainder = remainder.strip()
+                    remainder = remainder.strip('<>').strip()
                     # only allow mailinglist delivery to MY_DOMAINS
                     if remainder not in MY_DOMAINS:
                         print "{} not in {}".format(remainder, MY_DOMAINS)
-                        return
+                        continue
                     destination = None
                     if list_id not in mailboxes.keys():
                         # maildir doesn't exist: create it.
